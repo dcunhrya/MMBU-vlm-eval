@@ -8,6 +8,7 @@ DEFAULT_ENV=".venv"
 LLAVA_ENV="llava"
 
 DEFAULT_LOCK="uv.lock"
+DEFAULT_REQ="requirements-default.txt"
 LLAVA_LOCK="uv-llava.lock"
 
 LLAVA_REPO_URL="https://github.com/microsoft/LLaVA-Med.git"
@@ -38,7 +39,7 @@ else
     info "Creating default uv environment ($DEFAULT_ENV)"
     uv venv --python 3.11 "$DEFAULT_ENV"
     source "$DEFAULT_ENV/bin/activate"
-    uv sync
+    uv pip install -r "$DEFAULT_REQ"
     deactivate
 fi
 
