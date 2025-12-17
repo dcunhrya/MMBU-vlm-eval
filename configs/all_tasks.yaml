@@ -5,31 +5,31 @@ model:
 
 tasks:
   - name: "classification_closed_VQA"
-    data_path: "final_cls/final_subsampled_cls_closed_11_30_25.tsv"
+    data_path: "final_cls/final_subsampled_cls_closed_12_15_25.tsv"
 
   - name: "classification_open_VQA"
-    data_path: "final_cls/final_subsampled_cls_open_11_30_25.tsv"
+    data_path: "final_cls/final_subsampled_cls_open_12_15_25.tsv"
     
   - name: "detection_guess_bbox_closed_VQA"
-    data_path: "final_det/final_subsampled_det_guess_bbox_closed.tsv"
+    data_path: "final_det/final_subsampled_det_guess_bbox_closed_12_15.tsv"
 
   - name: "detection_guess_bbox_open_VQA"
-    data_path: "final_det/final_subsampled_det_guess_bbox_open.tsv"
+    data_path: "final_det/final_subsampled_det_guess_bbox_open_12_15.tsv"
 
   - name: "detection_grounding_closed_VQA"
-    data_path: "final_det/final_subsampled_det_grounding_closed.tsv"
+    data_path: "final_det/final_subsampled_det_grounding_closed_12_15.tsv"
 
   - name: "detection_grounding_open_VQA"
-    data_path: "final_det/final_subsampled_det_grounding_open.tsv"
+    data_path: "final_det/final_subsampled_det_grounding_open_12_15.tsv"
 
   - name: "segmentation_grounding_closed_VQA"
-    data_path: "final_seg/final_subsampled_seg_grounding_closed.tsv"
+    data_path: "final_seg/final_subsampled_seg_grounding_closed_12_15.tsv"
 
   - name: "segmentation_grounding_open_VQA"
-    data_path: "final_seg/final_subsampled_seg_grounding_open.tsv"
+    data_path: "final_seg/final_subsampled_seg_grounding_open_12_15.tsv"
 
   - name: "segmentation_guess_bbox_open_VQA"
-    data_path: "final_seg/final_subsampled_seg_guess_mask_open.tsv"
+    data_path: "final_seg/final_subsampled_seg_guess_mask_open_12_15.tsv"
 
 runtime:
   batch_size: 10
