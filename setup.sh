@@ -59,10 +59,18 @@ fi
 if [[ -d "$LLAVA_ENV" ]]; then
     warn "Environment '$LLAVA_ENV' already exists — skipping"
 else
-    info "Creating LLaVA uv environment ($LLAVA_ENV)"
+    info "Creating LLaVA uv environment ($LLAVA_ENV) with Python 3.11"
     uv venv --python 3.11 "$LLAVA_ENV"
     source "$LLAVA_ENV/bin/activate"
-    uv pip install -r "$LLAVA_LOCK"
+
+    info "Installing LLaVA-Med from source"
+    cd "$LLAVA_DIR"
+    uv pip install .
+    cd - >/dev/null
+
+    info "Removing bitsandbytes (not needed / causes conflicts)"
+    uv pip uninstall -y bitsandbytes
+
     deactivate
 fi
 
