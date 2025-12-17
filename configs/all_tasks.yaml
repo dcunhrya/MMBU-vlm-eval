@@ -1,0 +1,39 @@
+model:
+  type: "gemma3"
+  name: "google/gemma-3-4b-it"
+  device: "auto"
+
+tasks:
+  - name: "classification_closed_VQA"
+    data_path: "final_cls/final_subsampled_cls_closed_11_30_25.tsv"
+
+  - name: "classification_open_VQA"
+    data_path: "final_cls/final_subsampled_cls_open_11_30_25.tsv"
+    
+  - name: "detection_guess_bbox_closed_VQA"
+    data_path: "final_det/final_subsampled_det_guess_bbox_closed.tsv"
+
+  - name: "detection_guess_bbox_open_VQA"
+    data_path: "final_det/final_subsampled_det_guess_bbox_open.tsv"
+
+  - name: "detection_grounding_closed_VQA"
+    data_path: "final_det/final_subsampled_det_grounding_closed.tsv"
+
+  - name: "detection_grounding_open_VQA"
+    data_path: "final_det/final_subsampled_det_grounding_open.tsv"
+
+  - name: "segmentation_grounding_closed_VQA"
+    data_path: "final_seg/final_subsampled_seg_grounding_closed.tsv"
+
+  - name: "segmentation_grounding_open_VQA"
+    data_path: "final_seg/final_subsampled_seg_grounding_open.tsv"
+
+  - name: "segmentation_guess_bbox_open_VQA"
+    data_path: "final_seg/final_subsampled_seg_guess_mask_open.tsv"
+
+runtime:
+  batch_size: 10
+  max_new_tokens: 1024
+  save_every: 50
+  log_first_batch: true
+  output_dir: "/pasteur/u/rdcunha/code/mmbu/results"

@@ -1,0 +1,24 @@
+model:
+  type: "gemma3"
+  name: "google/gemma-3-4b-it"
+  device: "auto"
+
+tasks:
+  - name: "detection_guess_bbox_closed_VQA"
+    data_path: "final_det/final_subsampled_det_guess_bbox_closed_12_15.tsv"
+
+  - name: "detection_guess_bbox_open_VQA"
+    data_path: "final_det/final_subsampled_det_guess_bbox_open_12_15.tsv"
+
+  - name: "detection_grounding_closed_VQA"
+    data_path: "final_det/final_subsampled_det_grounding_closed_12_15.tsv"
+
+  - name: "detection_grounding_open_VQA"
+    data_path: "final_det/final_subsampled_det_grounding_open_12_15.tsv"
+
+runtime:
+  batch_size: 10
+  max_new_tokens: 1024
+  save_every: 50
+  log_first_batch: true
+  output_dir: "/pasteur/u/rdcunha/code/mmbu/results"

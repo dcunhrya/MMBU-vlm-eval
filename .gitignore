@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+.venv/
+llava/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS junk
+.DS_Store
+
+# Logs / caches
+*.log
+.cache/
+
+# slurm logs
+slurm_logs/
+
+# tmp files
+tmpd821i9tb/
+tmpf24sxs3k/
+tmpzqct6q0r/
+
+# External repo
+LLaVA-Med/
+
+# eval
+eval/*
+!eval/
+!eval/cls_eval.sh
+!eval/det_eval.sh
+!eval/seg_eval.sh
+
+# configs
+configs/*
+!configs/
+!configs/all_tasks.yaml
+!configs/cls_config.yaml
+!configs/det_config.yaml
+!configs/seg_config.yaml
+
+# random
+hold_gpu.sh
+run_vlm_eval_gemma2.py
+inference_status_report.txt

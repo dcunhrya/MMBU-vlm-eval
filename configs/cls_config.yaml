@@ -1,0 +1,18 @@
+model:
+  type: "qwen2_5vl"
+  name: "Qwen/Qwen2.5-VL-3B-Instruct"
+  device: "auto"
+
+tasks:
+  - name: "classification_closed_VQA"
+    data_path: "final_cls/final_subsampled_cls_closed_12_15_25.tsv"
+
+  - name: "classification_open_VQA"
+    data_path: "final_cls/final_subsampled_cls_open_12_15_25.tsv"
+
+runtime:
+  batch_size: 10
+  max_new_tokens: 1024
+  save_every: 50
+  log_first_batch: true
+  output_dir: "/pasteur/u/rdcunha/code/mmbu/results"
