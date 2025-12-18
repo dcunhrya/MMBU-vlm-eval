@@ -16,7 +16,7 @@ OR (if issue)
 
 # Running Code
 
-To run code you need to edit a .yaml config file in configs/ and a .sh eval file in eval/ and then run `sbatch scripts/{eval_file}.sh`
+To run code you need to edit a .yaml config file in configs/ and a .sh eval file in eval/ and then run `sbatch eval/{eval_file}.sh`
 
 ## Configs
 
@@ -28,7 +28,7 @@ In a .yaml file:
     - All task are defined in the 'Tasks' section
 - In "runtime", no need to change anything unless you want to edit model params or output dir
 
-## Eval (Scripts)
+## Eval
 
 In a .sh file (examples of cls, det, seg are shown):
 

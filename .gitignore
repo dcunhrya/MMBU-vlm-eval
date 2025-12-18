@@ -54,3 +54,5 @@ configs/*
 scripts/hold_gpu.sh
 src/run_vlm_eval_gemma2.py
 inference_status_report.txt
+modelnames.txt
+

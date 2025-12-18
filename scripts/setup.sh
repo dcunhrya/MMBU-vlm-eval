@@ -70,7 +70,7 @@ else
     popd >/dev/null
 
     info "Removing bitsandbytes (not needed / causes conflicts)"
-    uv pip uninstall -y bitsandbytes
+    uv pip uninstall bitsandbytes
 
     deactivate
 fi
