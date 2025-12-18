@@ -10,6 +10,9 @@
 #SBATCH --output=slurm_logs/base-%j-out.txt
 #SBATCH --error=slurm_logs/base-%j-err.txt
 
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$REPO_ROOT"
+
 mkdir -p slurm_logs
 
 source /pasteur/u/rdcunha/code/mmbu/inference/.venv/bin/activate
@@ -23,7 +26,7 @@ export PYTHONPATH="$(pwd):$PYTHONPATH"
 echo "Running run_vlm_eval.py"
 
 CONFIG_PATH="configs/det_config.yaml"
-MODEL_TYPE="llava"
-MODEL_NAME="llava-hf/llava-1.5-7b-hf"
+MODEL_TYPE="qwen2_5vl"
+MODEL_NAME="Qwen/Qwen2.5-VL-3B-Instruct"
 
-python run_vlm_eval.py --config ${CONFIG_PATH} --type ${MODEL_TYPE} --name ${MODEL_NAME}
+python src/run_vlm_eval.py --config ${CONFIG_PATH} --type ${MODEL_TYPE} --name ${MODEL_NAME}

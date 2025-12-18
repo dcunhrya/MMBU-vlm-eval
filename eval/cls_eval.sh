@@ -10,6 +10,9 @@
 #SBATCH --output=slurm_logs/base-%j-out.txt
 #SBATCH --error=slurm_logs/base-%j-err.txt
 
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$REPO_ROOT"
+
 mkdir -p slurm_logs
 
 source /pasteur/u/rdcunha/code/mmbu/inference/.venv/bin/activate
@@ -26,4 +29,4 @@ CONFIG_PATH="configs/cls_config.yaml"
 MODEL_TYPE="llava"
 MODEL_NAME="llava-hf/llava-1.5-7b-hf"
 
-python run_vlm_eval.py --config ${CONFIG_PATH} --type ${MODEL_TYPE} --name ${MODEL_NAME}
+python src/run_vlm_eval.py --config ${CONFIG_PATH} --type ${MODEL_TYPE} --name ${MODEL_NAME}

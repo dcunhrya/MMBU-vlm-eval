@@ -6,36 +6,36 @@ llava will contain environment for LLaVA-Med model
 
 .venv will contain environment for all models
 
-- Can run `bash setup.sh`
+- Can run `bash scripts/setup.sh`
 
 OR (if issue)
 
-- Install uv.lock with `uv sync` to create .venv
-- Clone LLaVA-Med repo at root directory `git clone https://github.com/microsoft/LLaVA-Med.git`
-- Install uv-llava.lock in a new uv environment called llava
+- Install `requirements-default.txt` with `uv pip install -r requirements-default.txt` to create .venv
+- Clone LLaVA-Med repo in src directory `git clone https://github.com/microsoft/LLaVA-Med.git`
+- Install `requirements-llava.txt` in a new uv environment called llava
 
 # Running Code
 
-To run code you need to edit a .yaml config file in configs/ and a .sh eval file in eval/ and then run `sbatch eval/{file}.sh`
+To run code you need to edit a .yaml config file in configs/ and a .sh eval file in eval/ and then run `sbatch scripts/{eval_file}.sh`
 
 ## Configs
 
 In a .yaml file:
 
-- In "model", no need to change anything (this will be set in .sh eval file)
+- In "model", no need to change anything (this will be set in .sh scripts file for eval)
 - In "tasks", set the "name" and "data_path" for all eval tasks (can do multiple at once)
     - An example is shown in `configs/all_tasks.yaml`
     - All task are defined in the 'Tasks' section
 - In "runtime", no need to change anything unless you want to edit model params or output dir
 
-## Eval
+## Eval (Scripts)
 
 In a .sh file (examples of cls, det, seg are shown):
 
 - Change paths to current directory and environment directory
 - EDIT HUGGINGFACE TOKEN on line 19 (it will not work as the token you put on github expires)
 - CONFIG_PATH is path to .yaml file
-- MODEL_TYPE is listed in `models/__init__.py` and will be in the 'Models' section
+- MODEL_TYPE is listed in `src/models/__init__.py` and will be in the 'Models' section
 - MODEL_NAME is hf path to model and will be in the 'Models' section
 
 **NOTE**: All models can be run with `run_vlm_eval.py` EXCEPT GEMMA MODELS NEED `run_vlm_eval_gemma.py`

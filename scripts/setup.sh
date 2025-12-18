@@ -27,9 +27,6 @@ die()  { echo "[ERROR] $1"; exit 1; }
 command -v uv >/dev/null 2>&1 || die "uv is not installed or not on PATH"
 command -v git >/dev/null 2>&1 || die "git is not installed"
 
-[[ -f "$DEFAULT_LOCK" ]] || die "Missing $DEFAULT_LOCK"
-[[ -f "$LLAVA_LOCK"   ]] || die "Missing $LLAVA_LOCK"
-
 # ==================================================
 # Create default uv environment (.venv)
 # ==================================================
@@ -39,6 +36,7 @@ else
     info "Creating default uv environment ($DEFAULT_ENV)"
     uv venv --python 3.11 "$DEFAULT_ENV"
     source "$DEFAULT_ENV/bin/activate"
+    uv pip install -e .
     uv pip install -r "$DEFAULT_REQ"
     deactivate
 fi
@@ -46,11 +44,11 @@ fi
 # ==================================================
 # Clone LLaVA-Med (repo root level)
 # ==================================================
-if [[ -d "$LLAVA_DIR" ]]; then
-    warn "LLaVA-Med already exists — skipping clone"
+if [[ -d "src/$LLAVA_DIR" ]]; then
+    warn "LLaVA-Med already exists in src/ — skipping clone"
 else
-    info "Cloning LLaVA-Med into repo root"
-    git clone "$LLAVA_REPO_URL"
+    info "Cloning LLaVA-Med into src/"
+    git clone "$LLAVA_REPO_URL" "src/$LLAVA_DIR"
 fi
 
 # ==================================================
@@ -60,13 +58,16 @@ if [[ -d "$LLAVA_ENV" ]]; then
     warn "Environment '$LLAVA_ENV' already exists — skipping"
 else
     info "Creating LLaVA uv environment ($LLAVA_ENV) with Python 3.11"
+
     uv venv --python 3.11 "$LLAVA_ENV"
     source "$LLAVA_ENV/bin/activate"
+    uv pip install -e .
 
-    info "Installing LLaVA-Med from source"
-    cd "$LLAVA_DIR"
+    info "Installing LLaVA-Med from source (src/$LLAVA_DIR)"
+    [[ -d "src/$LLAVA_DIR" ]] || die "src/$LLAVA_DIR not found"
+    pushd "src/$LLAVA_DIR" >/dev/null
     uv pip install .
-    cd - >/dev/null
+    popd >/dev/null
 
     info "Removing bitsandbytes (not needed / causes conflicts)"
     uv pip uninstall -y bitsandbytes

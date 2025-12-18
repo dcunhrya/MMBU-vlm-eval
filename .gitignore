@@ -1,3 +1,9 @@
+# Build artifacts
+build/
+dist/
+*.egg-info/
+src/*.egg-info/
+
 # Python
 __pycache__/
 *.pyc
@@ -27,7 +33,7 @@ tmpf24sxs3k/
 tmpzqct6q0r/
 
 # External repo
-LLaVA-Med/
+src/LLaVA-Med/
 
 # eval
 eval/*
@@ -45,6 +51,6 @@ configs/*
 !configs/seg_config.yaml
 
 # random
-hold_gpu.sh
-run_vlm_eval_gemma2.py
+scripts/hold_gpu.sh
+src/run_vlm_eval_gemma2.py
 inference_status_report.txt
