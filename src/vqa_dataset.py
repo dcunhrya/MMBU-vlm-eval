@@ -42,15 +42,25 @@ class PromptDataset(Dataset):
             final_img = img.copy()
         img = pad_to_512(final_img)
 
-        base = {
-            "index": int(row["index"]),
-            "question": row["question"],
-            "image_path": row["image_path"],
-            "dataset": row["dataset"],
-            "class_label": row["class_label"],
-            "image": img,
-            "modality": row["modality"],
-        }
+        try:
+            base = {
+                "index": int(row["index"]),
+                "question": row["question"],
+                "image_path": row["image_path"],
+                "dataset": row["dataset"],
+                "class_label": row["class_label"],
+                "image": img,
+                "modality": row["metadata_modality"],
+            }
+        except:
+            base = {
+                "index": int(row["index"]),
+                "question": row["question"],
+                "image_path": row["image_path"],
+                # "dataset": row["dataset"],
+                "image": img,
+                "modality": row["metadata_modality"],
+            }
 
         if self.add_options:
             base["question"] = row["question"] + f" Options: {row['options']}"

@@ -10,6 +10,7 @@ try:
     from .qwen3 import Qwen3Adapter
     from .internvl3_5 import InternVL35Adapter
     from .llava import LlavaAdapter
+    from .octomed import OctoMedAdapter
 except:
     pass
 
@@ -28,6 +29,7 @@ try:
         "qwen3vl": Qwen3Adapter,
         "intern": InternVL35Adapter,
         "llava": LlavaAdapter,
+        "octomed": OctoMedAdapter
         # "llavamed": LlavaMedAdapter,
     }
 except:
