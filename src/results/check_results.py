@@ -5,7 +5,7 @@ import pandas as pd
 from glob import glob
 from collections import defaultdict
 
-ROOT_RESULTS = "/pasteur/u/rdcunha/code/mmbu/results"
+ROOT_RESULTS = "/pasteur/u/rdcunha/code/mmbu/results_cot_v3"
 ROOT_TSV = "/pasteur/u/rdcunha/data_cache/mmbu/final_data/subsampled_mmbu_data"
 OUT_PATH = "inference_status_report.txt"
 
@@ -13,16 +13,16 @@ OUT_PATH = "inference_status_report.txt"
 # Mapping result task → TSV path
 # -------------------------------------------------------
 TASK_TO_TSV = {
-    "classification_closed_VQA": "final_cls/final_subsampled_cls_closed_12_29_25.tsv",
-    "classification_open_VQA": "final_cls/final_subsampled_cls_open_12_29_25.tsv",
-    "detection_grounding_closed_VQA": "final_det/final_subsampled_det_grounding_closed_12_29.tsv",
-    "detection_grounding_open_VQA": "final_det/final_subsampled_det_grounding_open_12_29.tsv",
-    "detection_guess_bbox_closed_VQA": "final_det/final_subsampled_det_guess_bbox_closed_12_29-v2.tsv",
-    "detection_guess_bbox_open_VQA": "final_det/final_subsampled_det_guess_bbox_open_12_29.tsv",
-    "segmentation_grounding_closed_VQA": "final_seg/final_subsampled_seg_grounding_closed_12_29.tsv",
-    "segmentation_grounding_open_VQA": "final_seg/final_subsampled_seg_grounding_open_12_29.tsv",
-    "segmentation_guess_bbox_open_VQA": "final_seg/final_subsampled_seg_guess_mask_open_12_29.tsv",
-    "segmentation_guess_bbox_closed_VQA": "final_seg/final_subsampled_seg_guess_mask_closed_12_29.tsv",
+    "classification_closed_VQA_cot": "final_cot_v2/cls_closed.tsv",
+    "classification_open_VQA_cot": "final_cot_v2/cls_open.tsv",
+    "detection_grounding_closed_VQA_cot": "final_cot_v2/det_grounding_closed.tsv",
+    "detection_grounding_open_VQA_cot": "final_cot_v2/det_grounding_open.tsv",
+    "detection_guess_bbox_closed_VQA_cot": "final_cot_v2/det_guess_bbox_closed.tsv",
+    "detection_guess_bbox_open_VQA_cot": "final_cot_v2/det_guess_bbox_open.tsv",
+    "segmentation_grounding_closed_VQA_cot": "final_cot_v2/seg_grounding_closed.tsv",
+    "segmentation_grounding_open_VQA_cot": "final_cot_v2/seg_grounding_open.tsv",
+    # "segmentation_guess_bbox_open_VQA": "final_seg/final_subsampled_seg_guess_mask_open_1_7.tsv",
+    # "segmentation_guess_bbox_closed_VQA": "final_seg/final_subsampled_seg_guess_mask_closed_1_7.tsv",
 }
 
 # Cache TSV sizes so we only load them once

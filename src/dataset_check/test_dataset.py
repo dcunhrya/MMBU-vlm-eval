@@ -18,7 +18,7 @@ TSV_FILES = [
     'final_cls/final_subsampled_cls_open_1_13_v2.tsv',
     'final_cls/final_subsampled_cls_closed_1_13_v2.tsv',
     'final_det/final_subsampled_det_grounding_closed_1_13_v2.tsv',
-    'final_det/final_subsampled_det_grounding_open_1_13_v2.tsv',
+    'final_det/final_subsampled_det_grounding_open_1_13_v2.tsv't,
     # 'final_det/final_subsampled_det_guess_bbox_closed_1_12_v2.tsv',
     # 'final_det/final_subsampled_det_guess_bbox_open_1_12_v2.tsv',
     'final_seg/final_subsampled_seg_grounding_closed_1_13_v2.tsv',

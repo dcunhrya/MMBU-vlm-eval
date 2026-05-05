@@ -20,6 +20,11 @@ except:
     pass
 
 try:
+    from .api_models import OpenAIVisionAdapter, GeminiVisionAdapter
+except:
+    pass
+
+try:
     MODEL_REGISTRY = {
         "gemma3": Gemma3Adapter,
         "qwen2vl": Qwen2Adapter,
@@ -29,11 +34,13 @@ try:
         "qwen3vl": Qwen3Adapter,
         "intern": InternVL35Adapter,
         "llava": LlavaAdapter,
-        "octomed": OctoMedAdapter
+        "octomed": OctoMedAdapter,
+        "openai": OpenAIVisionAdapter,
+        "gemini": GeminiVisionAdapter
         # "llavamed": LlavaMedAdapter,
     }
 except:
-    MODEL_REGISTRY = {
+    MODEL_REGISTRY = {}
     # "gemma3": Gemma3Adapter,
     # "qwen2vl": Qwen2Adapter,
     # "qwen2_5vl": Qwen2_5Adapter,
@@ -42,8 +49,16 @@ except:
     # "qwen3vl": Qwen3Adapter,
     # "intern": InternVL35Adapter,
     # "llava": LlavaAdapter,
-    "llavamed": LlavaMedAdapter,
-}
+    try:
+        MODEL_REGISTRY["llavamed"] = LlavaMedAdapter
+    except NameError:
+        pass
+
+try:
+    MODEL_REGISTRY["openai"] = OpenAIVisionAdapter
+    MODEL_REGISTRY["gemini"] = GeminiVisionAdapter
+except NameError:
+    pass
 
 def load_model_adapter(model_type, model_name, device, cache_dir):
     if model_type not in MODEL_REGISTRY:

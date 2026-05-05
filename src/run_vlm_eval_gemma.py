@@ -46,7 +46,7 @@ def main():
     model_cfg = cfg["model"]
     tasks_cfg = cfg["tasks"]
     run_cfg  = cfg["runtime"]
-    output_dir = '/pasteur/u/rdcunha/code/mmbu/results'
+    output_dir = run_cfg["output_dir"]
     
     # model_type = model_cfg["type"]
     # model_name = model_cfg["name"]
@@ -77,7 +77,7 @@ def main():
         tsv_path = os.path.join(base_path, task_cfg["data_path"])
         df = pd.read_csv(tsv_path, sep='\t')
         
-        add_options = ("open" not in task_cfg["name"])
+        add_options = ("closed" in task_cfg["name"])
         dataset = PromptDataset(df=df, add_options=add_options)
         loader = DataLoader(
             dataset,
@@ -133,15 +133,26 @@ def main():
         
                 # save results
                 for it, out_text in zip(new_batch, outputs):
-                    obj = {
-                        "index": it["index"],
-                        "question": it["question"],
-                        "image_path": it["image_path"],
-                        "dataset": it["dataset"],
-                        "modality": it["modality"],
-                        "class_label": it["class_label"],
-                        "answer": out_text
-                    }
+                    try:
+                        obj = {
+                            "index": it["index"],
+                            "question": it["question"],
+                            "image_path": it["image_path"],
+                            "dataset": it["dataset"],
+                            "modality": it["modality"],
+                            "class_label": it["class_label"],
+                            "answer": out_text
+                        }
+                    except:
+                        obj = {
+                            "index": it["index"],
+                            "question": it["question"],
+                            "image_path": it["image_path"],
+                            # "dataset": it["dataset"],
+                            "modality": it["modality"],
+                            "answer": out_text
+                        }
+                        
                     if "options" in it and it["options"] is not None:
                         obj["options"] = it["options"]
                 

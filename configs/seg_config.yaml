@@ -5,16 +5,16 @@ model:
 
 tasks:
   - name: "segmentation_grounding_open_VQA"
-    data_path: "final_seg/final_subsampled_seg_grounding_open_12_29.tsv"
+    data_path: "final_seg/final_subsampled_seg_grounding_open_1_7.tsv"
 
   - name: "segmentation_guess_bbox_open_VQA"
-    data_path: "final_seg/final_subsampled_seg_guess_mask_open_12_29.tsv"
+    data_path: "final_seg/final_subsampled_seg_guess_mask_open_1_7.tsv"
 
   - name: "segmentation_grounding_closed_VQA"
-    data_path: "final_seg/final_subsampled_seg_grounding_closed_12_29.tsv"
+    data_path: "final_seg/final_subsampled_seg_grounding_closed_1_7.tsv"
 
   - name: "segmentation_guess_bbox_closed_VQA"
-    data_path: "final_seg/final_subsampled_seg_guess_mask_closed_12_29.tsv"
+    data_path: "final_seg/final_subsampled_seg_guess_mask_closed_1_7.tsv"
 
 runtime:
   batch_size: 10
