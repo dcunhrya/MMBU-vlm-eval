@@ -10,6 +10,11 @@ The workflow and output structure are the same as the local Hugging Face model r
 - The model name is still selected with `--name`.
 - Results are still written as JSONL under the configured `runtime.output_dir`.
 
+The API example configs list all 10 evaluation tasks:
+
+- `configs/openai_api_example.yaml`
+- `configs/gemini_api_example.yaml`
+
 ## OpenAI
 
 Set your API key:
@@ -28,6 +33,16 @@ python src/run_vlm_eval.py \
 ```
 
 You can swap `gpt-4o` for another OpenAI vision-capable model if needed.
+
+To run a 10-example smoke test before the full evaluation, add `--test`:
+
+```bash
+python src/run_vlm_eval.py \
+  --config configs/openai_api_example.yaml \
+  --type openai \
+  --name gpt-4o \
+  --test
+```
 
 ## Gemini
 
@@ -48,6 +63,16 @@ python src/run_vlm_eval.py \
 
 You can swap `gemini-1.5-pro` for another Gemini multimodal model if needed.
 
+To run a 10-example smoke test before the full evaluation, add `--test`:
+
+```bash
+python src/run_vlm_eval.py \
+  --config configs/gemini_api_example.yaml \
+  --type gemini \
+  --name gemini-1.5-pro \
+  --test
+```
+
 ## Recommended API Settings
 
 API-backed models are called one sample at a time inside the adapter. For early testing, use `batch_size: 1` to avoid rate-limit surprises:
@@ -60,6 +85,10 @@ runtime:
   log_first_batch: true
   output_dir: "/pasteur/u/rdcunha/code/mmbu/results"
 ```
+
+The `--test` flag is only supported for the frontier API adapters (`openai` and `gemini`). It limits the run to at most 10 examples total across the configured tasks.
+
+Because the API example configs include all 10 tasks, use `--test` first to validate the full all-task configuration cheaply before removing `--test` for the complete run.
 
 ## Output
 

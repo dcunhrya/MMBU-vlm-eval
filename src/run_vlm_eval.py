@@ -11,6 +11,9 @@ from torch.utils.data import DataLoader
 from vqa_dataset import PromptDataset, prompt_collate, create_template
 from models import load_model_adapter
 
+FRONTIER_MODEL_TYPES = {"openai", "gemini"}
+TEST_EXAMPLE_LIMIT = 10
+
 
 def load_config(path):
     with open(path, "r") as f:
@@ -41,6 +44,8 @@ def main():
                         help="type of model used from models/__init__.py")
     parser.add_argument("--name", type=str, required=True,
                         help="huggingface path to model")
+    parser.add_argument("--test", action="store_true",
+                        help="for frontier API models, run at most 10 examples total")
     args = parser.parse_args()
     
     cfg = load_config(args.config)
@@ -55,6 +60,10 @@ def main():
     model_name = args.name
     device     = model_cfg.get("device", "auto")
     cache_dir  = "/pasteur/u/rdcunha/models"
+
+    if args.test and model_type not in FRONTIER_MODEL_TYPES:
+        raise ValueError("--test is only supported for frontier API model types: openai, gemini")
+    remaining_test_examples = TEST_EXAMPLE_LIMIT if args.test else None
 
     os.makedirs(output_dir, exist_ok=True)
     file_model_name = model_name.split('/')[-1]
@@ -77,6 +86,13 @@ def main():
         out_file = os.path.join(output_dir, f"{file_model_name.replace('/', '_')}_{task_cfg['name']}.jsonl")
         tsv_path = os.path.join(base_path, task_cfg["data_path"])
         df = pd.read_csv(tsv_path, sep='\t')
+        if remaining_test_examples is not None:
+            if remaining_test_examples <= 0:
+                print("Test limit reached; skipping remaining tasks.")
+                break
+            df = df.head(remaining_test_examples)
+            remaining_test_examples -= len(df)
+            print(f"Test mode: running {len(df)} examples for task {task_cfg['name']}")
         
         add_options = ("closed" in task_cfg["name"])
         dataset = PromptDataset(df=df, add_options=add_options)
