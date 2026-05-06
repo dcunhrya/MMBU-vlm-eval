@@ -49,6 +49,8 @@ configs/*
 !configs/cls_config.yaml
 !configs/det_config.yaml
 !configs/seg_config.yaml
+!configs/gemini_api_example.yaml
+!configs/openai_api_example.yaml
 
 # random
 scripts/hold_gpu.sh
