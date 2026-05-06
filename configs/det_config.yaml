@@ -4,17 +4,17 @@ model:
   device: "auto"
 
 tasks:
-  - name: "detection_guess_bbox_closed_VQA"
-    data_path: "final_det/final_subsampled_det_guess_bbox_closed_1_7.tsv"
+  - name: "detection_guess_bbox_closed_VQA_cot"
+    data_path: "final_cot_v2/det_guess_bbox_closed.tsv"
 
-  - name: "detection_guess_bbox_open_VQA"
-    data_path: "final_det/final_subsampled_det_guess_bbox_open_1_7.tsv"
+  - name: "detection_guess_bbox_open_VQA_cot"
+    data_path: "final_cot_v2/det_guess_bbox_open.tsv"
 
-  - name: "detection_grounding_open_VQA"
-    data_path: "final_det/final_subsampled_det_grounding_open_1_7-v2.tsv"
+  - name: "detection_grounding_open_VQA_cot"
+    data_path: "final_cot_v2/det_grounding_open.tsv"
 
-  - name: "detection_grounding_closed_VQA"
-    data_path: "final_det/final_subsampled_det_grounding_closed_1_7-v2.tsv"
+  - name: "detection_grounding_closed_VQA_cot"
+    data_path: "final_cot_v2/det_grounding_closed.tsv"
 
 
 runtime:
@@ -22,4 +22,4 @@ runtime:
   max_new_tokens: 2048
   save_every: 50
   log_first_batch: true
-  output_dir: "/pasteur/u/rdcunha/code/mmbu/results"
+  output_dir: "/pasteur/u/rdcunha/code/mmbu/results_cot_v3"

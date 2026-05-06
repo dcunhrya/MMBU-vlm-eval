@@ -1,5 +1,6 @@
 import base64
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
@@ -55,6 +56,16 @@ def _max_workers(batch_size):
         return max(1, min(batch_size, int(raw_value)))
     except ValueError:
         return batch_size
+
+
+def _gemini_max_workers(batch_size):
+    raw_value = os.environ.get("GEMINI_MAX_WORKERS")
+    if raw_value is not None:
+        try:
+            return max(1, min(batch_size, int(raw_value)))
+        except ValueError:
+            pass
+    return max(1, min(batch_size, 4))
 
 
 class OpenAIVisionAdapter(BaseVLMAdapter):
@@ -121,6 +132,9 @@ class OpenAIVisionAdapter(BaseVLMAdapter):
 
 
 class GeminiVisionAdapter(BaseVLMAdapter):
+    RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+    MAX_RETRIES = 4
+
     def load(self):
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
@@ -160,22 +174,39 @@ class GeminiVisionAdapter(BaseVLMAdapter):
             requests_batch.append(payload)
         return requests_batch
 
+    def _raise_for_response(self, response):
+        if response.ok:
+            return
+
+        try:
+            detail = response.json()
+        except ValueError:
+            detail = response.text
+        raise RuntimeError(f"Gemini API error {response.status_code}: {detail}")
+
     def _infer_one(self, api_key, url, payload, max_new_tokens):
         payload["generationConfig"]["maxOutputTokens"] = max_new_tokens
-        response = requests.post(
-            url,
-            params={"key": api_key},
-            json=payload,
-            timeout=120,
-        )
-        response.raise_for_status()
+        response = None
+        for attempt in range(self.MAX_RETRIES + 1):
+            response = requests.post(
+                url,
+                params={"key": api_key},
+                json=payload,
+                timeout=120,
+            )
+            if response.status_code not in self.RETRY_STATUS_CODES:
+                break
+            if attempt < self.MAX_RETRIES:
+                time.sleep(2 ** attempt)
+
+        self._raise_for_response(response)
         data = response.json()
         parts = data["candidates"][0]["content"].get("parts", [])
         return "".join(part.get("text", "") for part in parts)
 
     def infer(self, model, processor, inputs, max_new_tokens):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent"
-        with ThreadPoolExecutor(max_workers=_max_workers(len(inputs))) as executor:
+        with ThreadPoolExecutor(max_workers=_gemini_max_workers(len(inputs))) as executor:
             return list(
                 executor.map(
                     lambda payload: self._infer_one(model, url, payload, max_new_tokens),

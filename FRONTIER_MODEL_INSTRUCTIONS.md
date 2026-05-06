@@ -92,6 +92,12 @@ By default, concurrency matches the batch size. To lower parallelism without edi
 export FRONTIER_MAX_WORKERS=5
 ```
 
+Gemini uses a safer default of up to 4 concurrent requests per batch and retries transient `429`/`5xx` responses. To tune Gemini separately, set `GEMINI_MAX_WORKERS`:
+
+```bash
+export GEMINI_MAX_WORKERS=2
+```
+
 The `--test` flag is only supported for the frontier API adapters (`openai` and `gemini`). It limits the run to at most 10 examples total across the configured tasks.
 
 Because the API example configs include multiple tasks, use `--test` first to validate the full task configuration cheaply before removing `--test` for the complete run.
