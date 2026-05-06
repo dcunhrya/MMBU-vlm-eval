@@ -135,8 +135,9 @@ def main():
                     # model-specific input prep
                     inputs = adapter.prepare_inputs(messages, processor, model)
                     outputs = adapter.infer(model, processor, inputs, run_cfg["max_new_tokens"])
-                except: 
-                    print(f"could not generate for {batch}")
+                except Exception as e: 
+                    indexes = [x.get("index") for x in new_batch]
+                    print(f"could not generate for indexes {indexes}: {type(e).__name__}: {e}")
                     continue
         
                 # log first batch only

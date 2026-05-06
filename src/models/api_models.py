@@ -1,5 +1,6 @@
 import base64
 import os
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
 import requests
@@ -17,6 +18,43 @@ def _text_from_content(content):
     if isinstance(content, str):
         return content
     return "\n".join(part["text"] for part in content if part.get("type") == "text")
+
+
+def _chat_messages_to_responses_input(messages):
+    responses_input = []
+    for message in messages:
+        content = message["content"]
+        if isinstance(content, str):
+            responses_input.append(
+                {
+                    "role": message["role"],
+                    "content": [{"type": "input_text", "text": content}],
+                }
+            )
+            continue
+
+        response_content = []
+        for part in content:
+            if part["type"] == "text":
+                response_content.append({"type": "input_text", "text": part["text"]})
+            elif part["type"] == "image_url":
+                response_content.append(
+                    {"type": "input_image", "image_url": part["image_url"]["url"]}
+                )
+        responses_input.append({"role": message["role"], "content": response_content})
+    return responses_input
+
+
+def _max_workers(batch_size):
+    if batch_size <= 0:
+        return 1
+    raw_value = os.environ.get("FRONTIER_MAX_WORKERS")
+    if raw_value is None:
+        return batch_size
+    try:
+        return max(1, min(batch_size, int(raw_value)))
+    except ValueError:
+        return batch_size
 
 
 class OpenAIVisionAdapter(BaseVLMAdapter):
@@ -55,17 +93,31 @@ class OpenAIVisionAdapter(BaseVLMAdapter):
             requests_batch.append(request_messages)
         return requests_batch
 
-    def infer(self, model, processor, inputs, max_new_tokens):
-        outputs = []
-        for messages in inputs:
-            response = model.chat.completions.create(
+    def _infer_one(self, model, messages, max_new_tokens):
+        if self.model_name.startswith("gpt-5"):
+            response = model.responses.create(
                 model=self.model_name,
-                messages=messages,
-                max_tokens=max_new_tokens,
-                temperature=0,
+                input=_chat_messages_to_responses_input(messages),
+                max_output_tokens=max_new_tokens,
             )
-            outputs.append(response.choices[0].message.content or "")
-        return outputs
+            return response.output_text or ""
+
+        response = model.chat.completions.create(
+            model=self.model_name,
+            messages=messages,
+            max_tokens=max_new_tokens,
+            temperature=0,
+        )
+        return response.choices[0].message.content or ""
+
+    def infer(self, model, processor, inputs, max_new_tokens):
+        with ThreadPoolExecutor(max_workers=_max_workers(len(inputs))) as executor:
+            return list(
+                executor.map(
+                    lambda messages: self._infer_one(model, messages, max_new_tokens),
+                    inputs,
+                )
+            )
 
 
 class GeminiVisionAdapter(BaseVLMAdapter):
@@ -108,19 +160,25 @@ class GeminiVisionAdapter(BaseVLMAdapter):
             requests_batch.append(payload)
         return requests_batch
 
+    def _infer_one(self, api_key, url, payload, max_new_tokens):
+        payload["generationConfig"]["maxOutputTokens"] = max_new_tokens
+        response = requests.post(
+            url,
+            params={"key": api_key},
+            json=payload,
+            timeout=120,
+        )
+        response.raise_for_status()
+        data = response.json()
+        parts = data["candidates"][0]["content"].get("parts", [])
+        return "".join(part.get("text", "") for part in parts)
+
     def infer(self, model, processor, inputs, max_new_tokens):
-        outputs = []
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent"
-        for payload in inputs:
-            payload["generationConfig"]["maxOutputTokens"] = max_new_tokens
-            response = requests.post(
-                url,
-                params={"key": model},
-                json=payload,
-                timeout=120,
+        with ThreadPoolExecutor(max_workers=_max_workers(len(inputs))) as executor:
+            return list(
+                executor.map(
+                    lambda payload: self._infer_one(model, url, payload, max_new_tokens),
+                    inputs,
+                )
             )
-            response.raise_for_status()
-            data = response.json()
-            parts = data["candidates"][0]["content"].get("parts", [])
-            outputs.append("".join(part.get("text", "") for part in parts))
-        return outputs

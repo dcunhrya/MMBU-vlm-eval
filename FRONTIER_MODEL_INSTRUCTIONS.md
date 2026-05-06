@@ -10,7 +10,7 @@ The workflow and output structure are the same as the local Hugging Face model r
 - The model name is still selected with `--name`.
 - Results are still written as JSONL under the configured `runtime.output_dir`.
 
-The API example configs list all 10 evaluation tasks:
+The API example configs list the frontier evaluation tasks:
 
 - `configs/openai_api_example.yaml`
 - `configs/gemini_api_example.yaml`
@@ -29,10 +29,10 @@ Run with the OpenAI adapter:
 python src/run_vlm_eval.py \
   --config configs/openai_api_example.yaml \
   --type openai \
-  --name gpt-4o
+  --name gpt-5.4-mini
 ```
 
-You can swap `gpt-4o` for another OpenAI vision-capable model if needed.
+You can swap `gpt-5.4-mini` for another OpenAI vision-capable model if needed. Use the exact OpenAI model id with hyphens.
 
 To run a 10-example smoke test before the full evaluation, add `--test`:
 
@@ -40,7 +40,7 @@ To run a 10-example smoke test before the full evaluation, add `--test`:
 python src/run_vlm_eval.py \
   --config configs/openai_api_example.yaml \
   --type openai \
-  --name gpt-4o \
+  --name gpt-5.4-mini \
   --test
 ```
 
@@ -75,20 +75,26 @@ python src/run_vlm_eval.py \
 
 ## Recommended API Settings
 
-API-backed models are called one sample at a time inside the adapter. For early testing, use `batch_size: 1` to avoid rate-limit surprises:
+The API example configs use `batch_size: 10`. The frontier adapters send each batch concurrently and preserve output order.
 
 ```yaml
 runtime:
-  batch_size: 1
+  batch_size: 10
   max_new_tokens: 1024
   save_every: 50
   log_first_batch: true
   output_dir: "/pasteur/u/rdcunha/code/mmbu/results"
 ```
 
+By default, concurrency matches the batch size. To lower parallelism without editing YAML, set `FRONTIER_MAX_WORKERS`:
+
+```bash
+export FRONTIER_MAX_WORKERS=5
+```
+
 The `--test` flag is only supported for the frontier API adapters (`openai` and `gemini`). It limits the run to at most 10 examples total across the configured tasks.
 
-Because the API example configs include all 10 tasks, use `--test` first to validate the full all-task configuration cheaply before removing `--test` for the complete run.
+Because the API example configs include multiple tasks, use `--test` first to validate the full task configuration cheaply before removing `--test` for the complete run.
 
 ## Output
 
@@ -103,11 +109,11 @@ Output files are written under:
 For example:
 
 ```text
-/pasteur/u/rdcunha/code/mmbu/results/gpt-4o/gpt-4o_detection_grounding_open_VQA.jsonl
+/pasteur/u/rdcunha/code/mmbu/results/gpt-5.4-mini/gpt-5.4-mini_detection_grounding_open_VQA.jsonl
 ```
 
 ## Notes
 
 - Do not commit API keys. Set them through environment variables only.
 - Existing local model adapters are unchanged.
-- Existing task configs can still be used. The API example configs only set `batch_size: 1` for safer testing.
+- Existing task configs can still be used. The API example configs set `batch_size: 10` for concurrent frontier API runs.
