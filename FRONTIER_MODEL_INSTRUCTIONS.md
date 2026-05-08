@@ -62,6 +62,7 @@ python src/run_vlm_eval.py \
 ```
 
 You can swap `gemini-1.5-pro` for another Gemini multimodal model if needed.
+The `--name` value overrides the model name in the YAML config, so pass the exact model you want to test, for example `gemini-2.5-flash-lite`.
 
 To run a 10-example smoke test before the full evaluation, add `--test`:
 
@@ -97,6 +98,8 @@ Gemini uses a safer default of up to 4 concurrent requests per batch and retries
 ```bash
 export GEMINI_MAX_WORKERS=2
 ```
+
+If Gemini returns a hard quota error such as `RESOURCE_EXHAUSTED` or `Quota exceeded`, the adapter records that per example as `[FRONTIER_API_ERROR] ...` instead of leaving the JSONL empty.
 
 The `--test` flag is only supported for the frontier API adapters (`openai` and `gemini`). It limits the run to at most 10 examples total across the configured tasks.
 

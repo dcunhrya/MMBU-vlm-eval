@@ -68,6 +68,10 @@ def _gemini_max_workers(batch_size):
     return max(1, min(batch_size, 4))
 
 
+def _format_frontier_error(error):
+    return f"[FRONTIER_API_ERROR] {type(error).__name__}: {error}"
+
+
 class OpenAIVisionAdapter(BaseVLMAdapter):
     def load(self):
         if not os.environ.get("OPENAI_API_KEY"):
@@ -125,14 +129,22 @@ class OpenAIVisionAdapter(BaseVLMAdapter):
         with ThreadPoolExecutor(max_workers=_max_workers(len(inputs))) as executor:
             return list(
                 executor.map(
-                    lambda messages: self._infer_one(model, messages, max_new_tokens),
+                    lambda messages: self._safe_infer_one(
+                        model, messages, max_new_tokens
+                    ),
                     inputs,
                 )
             )
 
+    def _safe_infer_one(self, model, messages, max_new_tokens):
+        try:
+            return self._infer_one(model, messages, max_new_tokens)
+        except Exception as e:
+            return _format_frontier_error(e)
+
 
 class GeminiVisionAdapter(BaseVLMAdapter):
-    RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+    RETRY_STATUS_CODES = {500, 502, 503, 504}
     MAX_RETRIES = 4
 
     def load(self):
@@ -184,6 +196,20 @@ class GeminiVisionAdapter(BaseVLMAdapter):
             detail = response.text
         raise RuntimeError(f"Gemini API error {response.status_code}: {detail}")
 
+    def _should_retry(self, response):
+        if response.status_code in self.RETRY_STATUS_CODES:
+            return True
+        if response.status_code != 429:
+            return False
+
+        try:
+            error = response.json().get("error", {})
+        except ValueError:
+            return False
+
+        message = error.get("message", "").lower()
+        return "quota exceeded" not in message and "retry in" not in message
+
     def _infer_one(self, api_key, url, payload, max_new_tokens):
         payload["generationConfig"]["maxOutputTokens"] = max_new_tokens
         response = None
@@ -194,7 +220,7 @@ class GeminiVisionAdapter(BaseVLMAdapter):
                 json=payload,
                 timeout=120,
             )
-            if response.status_code not in self.RETRY_STATUS_CODES:
+            if not self._should_retry(response):
                 break
             if attempt < self.MAX_RETRIES:
                 time.sleep(2 ** attempt)
@@ -209,7 +235,15 @@ class GeminiVisionAdapter(BaseVLMAdapter):
         with ThreadPoolExecutor(max_workers=_gemini_max_workers(len(inputs))) as executor:
             return list(
                 executor.map(
-                    lambda payload: self._infer_one(model, url, payload, max_new_tokens),
+                    lambda payload: self._safe_infer_one(
+                        model, url, payload, max_new_tokens
+                    ),
                     inputs,
                 )
             )
+
+    def _safe_infer_one(self, api_key, url, payload, max_new_tokens):
+        try:
+            return self._infer_one(api_key, url, payload, max_new_tokens)
+        except Exception as e:
+            return _format_frontier_error(e)
