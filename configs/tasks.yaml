@@ -1,0 +1,93 @@
+version: 1
+# Override with MMBU_DATA_ROOT. Loaded by mmbu.paths consumers; inference
+# runners should use mmbu.paths.data_root() rather than copying this string.
+data_root: /pasteur/u/rdcunha/data_cache/mmbu/final_data/subsampled_mmbu_data
+
+tasks:
+  - name: classification_closed_VQA_cot
+    aliases: [cls_closed]
+    inference_tsv: final_cot_v2/cls_closed.tsv
+    evaluation_tsv: final_cls/final_subsampled_cls_closed_1_13_v3.tsv
+    kind: closed
+    parser: closed
+    metrics: closed
+    supports_judge: true
+    primary_metric: f1_score
+
+  - name: classification_open_VQA_cot
+    aliases: [cls_open]
+    inference_tsv: final_cot_v2/cls_open.tsv
+    evaluation_tsv: final_cls/final_subsampled_cls_open_1_13_v3.tsv
+    kind: open
+    parser: open
+    metrics: open
+    supports_judge: true
+    primary_metric: f1_score
+
+  - name: detection_guess_bbox_closed_VQA_cot
+    aliases: [det_guess_bbox_closed]
+    inference_tsv: final_cot_v2/det_guess_bbox_closed.tsv
+    evaluation_tsv: final_det/final_subsampled_det_guess_bbox_closed_1_12_v2.tsv
+    kind: closed
+    parser: closed
+    metrics: closed
+    supports_judge: false
+    primary_metric: f1_score
+
+  - name: detection_guess_bbox_open_VQA_cot
+    aliases: [det_guess_bbox_open]
+    inference_tsv: final_cot_v2/det_guess_bbox_open.tsv
+    evaluation_tsv: final_det/final_subsampled_det_guess_bbox_open_1_12_v2.tsv
+    kind: open
+    parser: detection_bbox_open
+    metrics: detection_bbox_open
+    supports_judge: false
+    primary_metric: f1_score
+
+  - name: detection_grounding_closed_VQA_cot
+    aliases: [det_grounding_closed]
+    inference_tsv: final_cot_v2/det_grounding_closed.tsv
+    evaluation_tsv: final_det/final_subsampled_det_grounding_closed_1_13_v2.tsv
+    kind: closed
+    parser: closed
+    metrics: closed
+    supports_judge: true
+    aux_task: classification_closed_VQA_cot
+    aux_inference_tsv: final_cot_v2/cls_closed.tsv
+    primary_metric: f1_score
+
+  - name: detection_grounding_open_VQA_cot
+    aliases: [det_grounding_open]
+    inference_tsv: final_cot_v2/det_grounding_open.tsv
+    evaluation_tsv: final_det/final_subsampled_det_grounding_open_1_13_v2.tsv
+    kind: open
+    parser: open
+    metrics: open
+    supports_judge: true
+    aux_task: classification_open_VQA_cot
+    aux_inference_tsv: final_cot_v2/cls_open.tsv
+    primary_metric: f1_score
+
+  - name: segmentation_grounding_closed_VQA_cot
+    aliases: [seg_grounding_closed]
+    inference_tsv: final_cot_v2/seg_grounding_closed.tsv
+    evaluation_tsv: final_seg/final_subsampled_seg_grounding_closed_1_13_v2.tsv
+    kind: closed
+    parser: segmentation
+    metrics: segmentation
+    supports_judge: true
+    aux_task: classification_closed_VQA_cot
+    aux_inference_tsv: final_cot_v2/cls_closed.tsv
+    primary_metric: f1_score
+
+  - name: segmentation_grounding_open_VQA_cot
+    aliases: [seg_grounding_open]
+    inference_tsv: final_cot_v2/seg_grounding_open.tsv
+    evaluation_tsv: final_seg/final_subsampled_seg_grounding_open_1_13_v2.tsv
+    kind: open
+    parser: open_segmentation
+    metrics: open_segmentation
+    supports_judge: true
+    aux_task: classification_open_VQA_cot
+    aux_inference_tsv: final_cot_v2/cls_open.tsv
+    primary_metric: f1_score

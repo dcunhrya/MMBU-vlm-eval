@@ -1,5 +1,7 @@
 # MMBU Inference Evaluation Pipeline (Autoregressive)
 
+Workspace index: [CATALOG.md](CATALOG.md). Path defaults: `src/mmbu/paths.py` (`MMBU_DATA_ROOT`, `MMBU_RESULTS_DIR`, `MMBU_JUDGE_CACHE`). Open `mmbu.code-workspace` to include sibling analysis + HF-prep trees.
+
 # Setup
 
 llava will contain environment for LLaVA-Med model

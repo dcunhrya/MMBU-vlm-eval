@@ -10,19 +10,19 @@ from torch.utils.data import DataLoader
 
 from vqa_dataset import PromptDataset, prompt_collate, create_template
 from models import load_model_adapter
+from mmbu.paths import apply_runtime_cache_env, data_root, hf_home
 
 
 def load_config(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
-def set_envs(model_dir):
-    os.environ["HF_HOME"] = model_dir
-    os.environ["TRANSFORMERS_CACHE"] = model_dir
-    os.environ["HUGGINGFACE_HUB_CACHE"] = model_dir
-    os.environ["VLLM_CACHE_ROOT"] = model_dir
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # editable by config if needed
+def set_envs(model_dir=None):
+    apply_runtime_cache_env()
+    if model_dir:
+        os.environ["HF_HOME"] = model_dir
+        os.environ["TRANSFORMERS_CACHE"] = model_dir
+        os.environ["HUGGINGFACE_HUB_CACHE"] = model_dir
 
 
 def log_first_batch(batch_outputs, out_dir):
@@ -53,7 +53,7 @@ def main():
     model_type = args.type
     model_name = args.name
     device     = model_cfg.get("device", "auto")
-    cache_dir  = "/pasteur/u/rdcunha/models"
+    cache_dir = str(hf_home())
 
     os.makedirs(output_dir, exist_ok=True)
     file_model_name = model_name.split('/')[-1]
@@ -69,7 +69,7 @@ def main():
     # ----------------------------------
     # Dataset setup
     # ----------------------------------
-    base_path = '/pasteur/u/rdcunha/data_cache/mmbu/final_data/subsampled_mmbu_data'
+    base_path = str(data_root())
     
     for task_cfg in tasks_cfg:
         print(f"Running task: {task_cfg['name']}")
