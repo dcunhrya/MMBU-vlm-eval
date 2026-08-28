@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Envs
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+
+# Judge / metrics artifacts (bytes stay on Pasteur)
+llm_judge_cache/
+llm_judge_cache_gated_v1/
+**/llm_judge_cache/
+.cache/
+*.duckdb
+*.duckdb.wal
+
+# Large eval-split dumps (keep scripts; drop generated tables if huge)
+eval_split/outputs/
+
+# OS / notebooks
+.DS_Store
+*.log
+.ipynb_checkpoints/
