@@ -1,42 +1,33 @@
 #!/usr/bin/env python3
 import os
-import json
-import pandas as pd
+import sys
 from glob import glob
-from collections import defaultdict
+from pathlib import Path
 
-ROOT_RESULTS = "/pasteur/u/rdcunha/code/mmbu/results_cot_v3"
-ROOT_TSV = "/pasteur/u/rdcunha/data_cache/mmbu/final_data/subsampled_mmbu_data"
-OUT_PATH = "inference_status_report.txt"
+_SRC = Path(__file__).resolve().parents[1]
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
-# -------------------------------------------------------
-# Mapping result task → TSV path
-# -------------------------------------------------------
-TASK_TO_TSV = {
-    "classification_closed_VQA_cot": "final_cot_v2/cls_closed.tsv",
-    "classification_open_VQA_cot": "final_cot_v2/cls_open.tsv",
-    "detection_grounding_closed_VQA_cot": "final_cot_v2/det_grounding_closed.tsv",
-    "detection_grounding_open_VQA_cot": "final_cot_v2/det_grounding_open.tsv",
-    "detection_guess_bbox_closed_VQA_cot": "final_cot_v2/det_guess_bbox_closed.tsv",
-    "detection_guess_bbox_open_VQA_cot": "final_cot_v2/det_guess_bbox_open.tsv",
-    "segmentation_grounding_closed_VQA_cot": "final_cot_v2/seg_grounding_closed.tsv",
-    "segmentation_grounding_open_VQA_cot": "final_cot_v2/seg_grounding_open.tsv",
-    # "segmentation_guess_bbox_open_VQA": "final_seg/final_subsampled_seg_guess_mask_open_1_7.tsv",
-    # "segmentation_guess_bbox_closed_VQA": "final_seg/final_subsampled_seg_guess_mask_closed_1_7.tsv",
-}
+from mmbu.paths import data_root, results_dir, task_inference_tsvs
+
+OUT_PATH = os.environ.get("MMBU_STATUS_REPORT", "inference_status_report.txt")
+TASK_TO_TSV = task_inference_tsvs()
 
 # Cache TSV sizes so we only load them once
 TSV_SIZES = {}
 
+
 def load_tsv_size(task_name):
     """Return the number of rows for the TSV corresponding to a task."""
+    import pandas as pd
+
     if task_name not in TASK_TO_TSV:
         return None
 
     if task_name in TSV_SIZES:
         return TSV_SIZES[task_name]
 
-    tsv_path = os.path.join(ROOT_TSV, TASK_TO_TSV[task_name])
+    tsv_path = data_root() / TASK_TO_TSV[task_name]
     df = pd.read_csv(tsv_path, sep="\t")
     TSV_SIZES[task_name] = len(df)
     return TSV_SIZES[task_name]
@@ -44,18 +35,23 @@ def load_tsv_size(task_name):
 
 def count_jsonl_indexes(path):
     """Return number of unique indexes in a JSONL file."""
+    import json
+
     idxs = set()
     with open(path, "r") as f:
         for line in f:
             try:
                 j = json.loads(line)
                 idxs.add(j["index"])
-            except:
+            except Exception:
                 pass
     return len(idxs)
 
+
 def count_filled_answers(path):
     """Return number of JSONL rows where 'answer' is non-empty."""
+    import json
+
     count = 0
 
     with open(path, "r") as f:
@@ -64,33 +60,29 @@ def count_filled_answers(path):
                 j = json.loads(line)
                 ans = j.get("answer", None)
 
-                # Treat these as empty:
                 if ans is None:
                     continue
                 if isinstance(ans, str) and ans.strip().lower() in ["", "none", "null"]:
                     continue
 
                 count += 1
-            except:
+            except Exception:
                 pass
 
     return count
 
+
 def extract_task_name(filename, model_name):
-    """
-    Example: filename = 'gemma-3-4b-it_classification_closed_VQA.jsonl'
-    Returns: 'classification_closed_VQA'
-    """
     stripped = filename.replace(model_name + "_", "")
     return stripped.replace(".jsonl", "")
 
 
 def main():
     report_lines = []
+    root_results = results_dir()
 
-    # Iterate through each model folder
     model_dirs = sorted(
-        d for d in glob(os.path.join(ROOT_RESULTS, "*"))
+        d for d in glob(os.path.join(str(root_results), "*"))
         if os.path.isdir(d)
     )
 
@@ -99,7 +91,6 @@ def main():
 
         report_lines.append(f"\n=== {model_name} ===")
 
-        # Find all jsonl result files
         jsonl_files = sorted(glob(os.path.join(model_dir, "*.jsonl")))
 
         if not jsonl_files:
@@ -114,22 +105,16 @@ def main():
                 report_lines.append(f"  {filename}: Unknown task")
                 continue
 
-            # JSONL size
-            # n_jsonl = count_jsonl_indexes(path)
             n_jsonl = count_filled_answers(path)
-
-            # TSV size
             n_tsv = load_tsv_size(task_name)
 
-            # Check completion
-            ok = abs(n_jsonl - n_tsv) <= 200
+            ok = n_tsv is not None and n_jsonl == n_tsv
             status = "✔" if ok else "✖"
 
             report_lines.append(
                 f"  {task_name:<40} {status}  (JSONL: {n_jsonl} / TSV: {n_tsv})"
             )
 
-    # Write report
     with open(OUT_PATH, "w") as f:
         f.write("\n".join(report_lines))
 

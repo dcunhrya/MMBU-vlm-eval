@@ -1,0 +1,32 @@
+---
+description: Git commit identity and checkpoint-before-long-work policy
+alwaysApply: true
+---
+
+# Git Commits
+
+## Commit author identity
+
+Never commit under the agent's name. All commits must use the repo owner's identity:
+
+- **Name:** Ryan DCunha
+- **Email:** rdcunha@stanford.edu
+
+Before any commit, verify author identity with `git config user.name` and `git config user.email`. If either differs, set them for this repo only (do not change global git config):
+
+```bash
+git config user.name "Ryan DCunha"
+git config user.email "rdcunha@stanford.edu"
+```
+
+Do not use `--author`, `GIT_AUTHOR_*`, or `GIT_COMMITTER_*` overrides that would attribute the commit to anyone other than Ryan DCunha.
+
+## Checkpoint before long implementation
+
+Before starting any long or multi-step implementation (new features, large refactors, migrations, or work expected to touch many files), create a checkpoint commit of the current working state first.
+
+1. Check for uncommitted changes with `git status`.
+2. If there are changes worth preserving, stage and commit them with a clear message describing the pre-work state.
+3. Only then begin the implementation.
+
+This gives a clean rollback point if the long task goes wrong. Skip the checkpoint only when the working tree is already clean.

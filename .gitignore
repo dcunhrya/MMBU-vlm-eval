@@ -1,60 +1,48 @@
-# Build artifacts
-build/
-dist/
-*.egg-info/
-src/*.egg-info/
-
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*.egg-info/
+.pytest_cache/
 
-# Environments
+# Envs (never commit)
 .venv/
+venv/
+judge/
+judge_gemma4/
+qwen36/
+qwen36-vllm/
 llava/
 
-# Jupyter
-.ipynb_checkpoints/
+# Secrets
+.env
+.env.*
+!.env.example
 
-# OS junk
-.DS_Store
-
-# Logs / caches
-*.log
-.cache/
-
-# slurm logs
+# Runtime / pasteur artifacts (never commit)
 slurm_logs/
+.cache/
+inference_status_report.txt
+artifacts/llm_judge_cache
+artifacts/results_cot_v3
 
-# tmp files
-tmpd821i9tb/
-tmpf24sxs3k/
-tmpzqct6q0r/
-
-# External repo
+# External clones
 src/LLaVA-Med/
 
-# eval
+# OS / junk
+.DS_Store
+*.log
+.ipynb_checkpoints/
+
+# Legacy local-only eval wrappers (tokens; use python -m mmbu submit)
 eval/*
 !eval/
 !eval/cls_eval.sh
 !eval/det_eval.sh
 !eval/seg_eval.sh
+!eval/generated/
 
-# configs
-configs/*
-!configs/
-!configs/all_tasks.yaml
-!configs/cls_config.yaml
-!configs/det_config.yaml
-!configs/seg_config.yaml
-!configs/gemini_api_example.yaml
-!configs/openai_api_example.yaml
-
-# random
+# Local one-offs
 scripts/hold_gpu.sh
 src/run_vlm_eval_gemma2.py
-inference_status_report.txt
 modelnames.txt
-
+tmp*/

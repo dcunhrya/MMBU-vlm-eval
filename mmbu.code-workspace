@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "name": "inference",
+      "path": "."
+    },
+    {
+      "name": "analysis",
+      "path": "../src/analysis"
+    },
+    {
+      "name": "prepare_final_dataset",
+      "path": "../src/prepare_final_dataset"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.venv": true,
+      "**/llava": true,
+      "**/judge": true,
+      "**/qwen36": true,
+      "**/qwen36-vllm": true
+    }
+  }
+}

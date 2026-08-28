@@ -1,0 +1,22 @@
+---
+description: Keep agent replies brief and avoid unnecessary verbosity
+alwaysApply: true
+---
+
+# Brief responses
+
+Keep replies short and direct. Brevity takes priority over polished prose.
+
+## Defaults
+
+- Lead with the answer or outcome; skip preamble and recap.
+- Match length to task: simple questions get short replies; go longer only for complex debugging, architecture, or multi-step work.
+- Cut filler: no restating the user's request, no "I'll now...", no engagement bait at the end.
+- Prefer bullets or short sections over long paragraphs when listing steps or options.
+- Stay precise: brief does not mean vague — include needed file paths, commands, and code citations.
+
+## Examples
+
+**Bad:** long intro, restated question, detailed plan recap, closing offer to help further.
+
+**Good:** direct answer in 2–4 sentences, or a short bullet list when listing items.

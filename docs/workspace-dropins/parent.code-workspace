@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "name": "inference",
+      "path": "inference"
+    },
+    {
+      "name": "analysis",
+      "path": "src/analysis"
+    },
+    {
+      "name": "prepare_final_dataset",
+      "path": "src/prepare_final_dataset"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.venv": true
+    }
+  }
+}

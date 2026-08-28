@@ -1,0 +1,44 @@
+---
+description: Route all settable caches to pasteur paths from eval scripts (never sailhome/AFS home)
+alwaysApply: true
+---
+
+# Cache paths (pasteur, not sailhome)
+
+Sailhome/AFS home (`~`, `/afs/cs.stanford.edu/u/rdcunha`) has a **20 GB quota**. Runtime caches must **not** land there.
+
+Use the paths established in `eval/judge_experiments/run_factorial_*.sbatch` and `src/mmbu/infer.py`:
+
+| Purpose | Path | Env vars |
+|---------|------|----------|
+| General runtime / XDG cache | `/pasteur/u/rdcunha/.cache` | `XDG_CACHE_HOME` |
+| vLLM / torch compile cache | `/pasteur/u/rdcunha/.cache/vllm` | `VLLM_CACHE_ROOT` |
+| HuggingFace model weights & hub cache | `/pasteur/u/rdcunha/models` | `HF_HOME`, `TRANSFORMERS_CACHE`, `HUGGINGFACE_HUB_CACHE` |
+| uv package cache | `/pasteur/u/rdcunha/uv_cache` | `UV_CACHE_DIR` |
+
+## When adding or editing scripts
+
+- **Shell / sbatch eval jobs**: export the vars above before running Python, vLLM, or pip-heavy workloads. Mirror `eval/judge_experiments/run_factorial_qwen35.sbatch`.
+- **uv** (`uv sync`, `uv pip install`, etc.): export `UV_CACHE_DIR` before any uv command so the cache lands on pasteur, not sailhome.
+- **Python inference**: use `set_model_envs()` from `src/mmbu/infer.py` or pass `cache_dir="/pasteur/u/rdcunha/models"`.
+- **New CLI flags / config knobs** for cache locations: default to these pasteur paths, not `~/.cache` or relative `.cache`.
+- **Project result caches** (e.g. LLM judge CSVs): keep under repo/analysis paths on pasteur (e.g. `.../finalized_analysis/llm_judge_cache`), not sailhome.
+
+## Shell snippet (copy into eval jobs)
+
+```bash
+CACHE_ROOT="/pasteur/u/rdcunha/.cache"
+export XDG_CACHE_HOME="${CACHE_ROOT}"
+export VLLM_CACHE_ROOT="${CACHE_ROOT}/vllm"
+export HF_HOME="/pasteur/u/rdcunha/models"
+export TRANSFORMERS_CACHE="${HF_HOME}"
+export HUGGINGFACE_HUB_CACHE="${HF_HOME}"
+export UV_CACHE_DIR="/pasteur/u/rdcunha/uv_cache"
+mkdir -p "${XDG_CACHE_HOME}" "${VLLM_CACHE_ROOT}" "${HF_HOME}" "${UV_CACHE_DIR}"
+```
+
+## Do not
+
+- Rely on default `~/.cache/huggingface` (writes to sailhome).
+- Run uv without `UV_CACHE_DIR` (defaults to `$XDG_CACHE_HOME/uv` or `~/.cache/uv` on sailhome).
+- Add caches under `/sailhome/rdcunha` or `$HOME/.cache` without overriding env vars.
