@@ -118,7 +118,10 @@ def apply_runtime_cache_env() -> dict[str, str]:
         os.environ.setdefault(key, value)
         applied[key] = os.environ[key]
         if key in _CACHE_DIR_KEYS:
-            Path(applied[key]).mkdir(parents=True, exist_ok=True)
+            try:
+                Path(applied[key]).mkdir(parents=True, exist_ok=True)
+            except OSError:
+                pass
     return applied
 
 
@@ -134,3 +137,16 @@ def load_tasks_config(path: str | Path | None = None) -> dict:
 def task_inference_tsvs(path: str | Path | None = None) -> dict[str, str]:
     payload = load_tasks_config(path)
     return {task["name"]: task["inference_tsv"] for task in payload["tasks"]}
+
+
+def eval_split_v4_dir() -> Path:
+    """Frozen v4 public/private split outputs (mmbu-context competition)."""
+    return _env_path(
+        "MMBU_SPLIT_VERSION_DIR",
+        workspace_root()
+        / "src/analysis/eval_split/outputs/mmbu_eval_split_v4_open_private",
+    )
+
+
+def eval_split_v4_row_mapping() -> Path:
+    return eval_split_v4_dir() / "release" / "row_split_mapping.parquet"

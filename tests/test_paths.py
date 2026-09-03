@@ -59,3 +59,10 @@ def test_inference_repo_root_is_workspace():
     assert (inference_repo_root() / "configs" / "tasks.yaml").is_file()
     with open(inference_repo_root() / "configs" / "tasks.yaml") as f:
         yaml.safe_load(f)
+
+
+def test_eval_split_v4_paths():
+    from mmbu.paths import eval_split_v4_dir, eval_split_v4_row_mapping
+
+    assert "mmbu_eval_split_v4_open_private" in str(eval_split_v4_dir())
+    assert eval_split_v4_row_mapping().name == "row_split_mapping.parquet"

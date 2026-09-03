@@ -14,6 +14,16 @@ This is a research-engineering repo. Prefer resume over rerun, join existing art
 - Secrets in `.env` only. Pasteur cache env on every GPU/`uv` job (`apply_runtime_cache_env()`).
 - Join production results on `index`. Check `question_type` before reusing a model dir.
 
+## Judge (open-VQA answer equivalence)
+
+- **Live rubric:** per-dataset label set + two-gate grounding/equivalence — prompt variant
+  `open_per_dataset_v3`. See [`docs/open_vqa_per_dataset_judge.md`](docs/open_vqa_per_dataset_judge.md).
+- **Not** the `metadata_cot` metadata-field judge.
+- **Production GPU judge:** `Qwen/Qwen2.5-32B-Instruct-AWQ`. **API adjudicator:** `claude-sonnet-5`.
+- **CLI:** `python -m mmbu judge --kind open --judge-model claude-sonnet-5` (requires full
+  `src/mmbu/eval/` on Pasteur). **v4 subset:** `scripts/run_sonnet_v4_open_rejudge.py`.
+- Cache: `judge_cache_open()` from `mmbu.paths`; never write into the Qwen partition when using Sonnet.
+
 ## Do not
 
 - Copy or edit `eval/*_eval*.sh`. Gemma fallback: `run_vlm_eval_gemma.py`.
